@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.spatial import distance
 from pylab import *
 import ntpath
-import audioFeatureExtraction as aF    
-import audioTrainTest as aT
+from . import audioFeatureExtraction as aF    
+from . import audioTrainTest as aT
 import sklearn
 import sklearn.discriminant_analysis
 
@@ -27,9 +27,9 @@ def levenshtein(str1, s2):
     N1 = len(str1)
     N2 = len(s2)
 
-    stringRange = [range(N1 + 1)] * (N2 + 1)
+    stringRange = [list(range(N1 + 1))] * (N2 + 1)
     for i in range(N2 + 1):
-        stringRange[i] = range(i,i + N1 + 1)
+        stringRange[i] = list(range(i,i + N1 + 1))
     for i in range(0,N2):
         for j in range(0,N1):
             if str1[j] == s2[i]:
@@ -116,7 +116,7 @@ def visualizeFeaturesFolder(folder, dimReductionMethod, priorKnowledge = "none")
     if dimReductionMethod=="pca":
         allMtFeatures, wavFilesList = aF.dirWavFeatureExtraction(folder, 30.0, 30.0, 0.050, 0.050, computeBEAT = True)
         if allMtFeatures.shape[0]==0:
-            print "Error: No data found! Check input folder"
+            print("Error: No data found! Check input folder")
             return
         
         namesCategoryToVisualize = [ntpath.basename(w).replace('.wav','').split(" --- ")[0] for w in wavFilesList]; 
@@ -142,7 +142,7 @@ def visualizeFeaturesFolder(folder, dimReductionMethod, priorKnowledge = "none")
     else:    
         allMtFeatures, Ys, wavFilesList = aF.dirWavFeatureExtractionNoAveraging(folder, 20.0, 5.0, 0.040, 0.040) # long-term statistics cannot be applied in this context (LDA needs mid-term features)
         if allMtFeatures.shape[0]==0:
-            print "Error: No data found! Check input folder"
+            print("Error: No data found! Check input folder")
             return
         
         namesCategoryToVisualize = [ntpath.basename(w).replace('.wav','').split(" --- ")[0] for w in wavFilesList]; 

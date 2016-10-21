@@ -31,7 +31,7 @@ def convertDirMP3ToWav(dirName, Fs, nC, useMp3TagsAsName = False):
 		else:
 			wavFileName = f.replace(".mp3",".wav")		
 		command = "avconv -i \"" + f + "\" -ar " +str(Fs) + " -ac " + str(nC) + " \"" + wavFileName + "\"";
-		print command
+		print(command)
 		os.system(command.decode('unicode_escape').encode('ascii','ignore').replace("\0",""))
 
 def convertFsDirWavToWav(dirName, Fs, nC):
@@ -57,7 +57,7 @@ def convertFsDirWavToWav(dirName, Fs, nC):
 	for f in filesToProcess:	
 		_, wavFileName = ntpath.split(f)	
 		command = "avconv -i \"" + f + "\" -ar " +str(Fs) + " -ac " + str(nC) + " \"" + newDir + os.sep + wavFileName + "\"";
-		print command
+		print(command)
 		os.system(command)
 
 def readAudioFile(path):
@@ -76,10 +76,10 @@ def readAudioFile(path):
 			x = numpy.fromstring(strsig, numpy.short).byteswap()
 			Fs = s.getframerate()
 		else:
-			print "Error in readAudioFile(): Unknown file type!"
+			print("Error in readAudioFile(): Unknown file type!")
 			return (-1,-1)
 	except IOError:	
-		print "Error: file not found or other I/O error."
+		print("Error: file not found or other I/O error.")
 		return (-1,-1)
 	return (Fs, x)
 
