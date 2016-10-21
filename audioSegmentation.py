@@ -3,9 +3,9 @@ import sklearn.cluster
 import time
 import scipy
 import os
-import audioFeatureExtraction as aF
-import audioTrainTest as aT
-import audioBasicIO
+import pyAudioAnalysis.audioFeatureExtraction as aF
+import pyAudioAnalysis.audioTrainTest as aT
+import pyAudioAnalysis.audioBasicIO
 import matplotlib.pyplot as plt
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
@@ -684,23 +684,13 @@ def silenceRemoval(x, Fs, stWin, stStep, smoothWindow=0.5, Weight=0.5, plot=Fals
     return segmentLimits
 
 
-def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.05, LDAdim=35, PLOT=False):
-    '''
-    ARGUMENTS:
-        - fileName:        the name of the WAV file to be analyzed
-        - numOfSpeakers    the number of speakers (clusters) in the recording (<=0 for unknown)
-        - mtSize (opt)     mid-term window size
-        - mtStep (opt)     mid-term window step
-        - stWin  (opt)     short-term window size
-        - LDAdim (opt)     LDA dimension (0 for no LDA)
-        - PLOT     (opt)   0 for not plotting the results 1 for plottingy
-    '''
-    [Fs, x] = audioBasicIO.readAudioFile(fileName)
-    x = audioBasicIO.stereo2mono(x)
+def speakerDiarizationWithData(data, rate, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.05, LDAdim=35, PLOT=False, fileName=""):
+    x = data
+    Fs = rate
     Duration = len(x) / Fs
 
-    [Classifier1, MEAN1, STD1, classNames1, mtWin1, mtStep1, stWin1, stStep1, computeBEAT1] = aT.loadKNNModel(os.path.join("data","knnSpeakerAll"))
-    [Classifier2, MEAN2, STD2, classNames2, mtWin2, mtStep2, stWin2, stStep2, computeBEAT2] = aT.loadKNNModel(os.path.join("data","knnSpeakerFemaleMale"))
+    [Classifier1, MEAN1, STD1, classNames1, mtWin1, mtStep1, stWin1, stStep1, computeBEAT1] = aT.loadKNNModel(os.path.join("pyAudioAnalysis/data","knnSpeakerAll"))
+    [Classifier2, MEAN2, STD2, classNames2, mtWin2, mtStep2, stWin2, stStep2, computeBEAT2] = aT.loadKNNModel(os.path.join("pyAudioAnalysis/data","knnSpeakerFemaleMale"))
 
     [MidTermFeatures, ShortTermFeatures] = aF.mtFeatureExtraction(x, Fs, mtSize * Fs, mtStep * Fs, round(Fs * stWin), round(Fs*stWin * 0.5))
 
@@ -915,6 +905,23 @@ def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.
             plt.ylabel("average clustering's sillouette");
         plt.show()
     return cls
+
+
+def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.05, LDAdim=35, PLOT=False):
+    '''
+    ARGUMENTS:
+        - fileName:        the name of the WAV file to be analyzed
+        - numOfSpeakers    the number of speakers (clusters) in the recording (<=0 for unknown)
+        - mtSize (opt)     mid-term window size
+        - mtStep (opt)     mid-term window step
+        - stWin  (opt)     short-term window size
+        - LDAdim (opt)     LDA dimension (0 for no LDA)
+        - PLOT     (opt)   0 for not plotting the results 1 for plottingy
+    '''
+    [Fs, x] = audioBasicIO.readAudioFile(fileName)
+    x = audioBasicIO.stereo2mono(x)
+    return speakerDiarizationWithData(x, Fs, fileName)
+
     
 def speakerDiarizationEvaluateScript(folderName, LDAs):
     '''
